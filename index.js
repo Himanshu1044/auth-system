@@ -107,7 +107,7 @@ app.post('/register', async (req, res) => {
     try {
         const exist = await db.query('SELECT * FROM users WHERE email=$1', [Email])
         if (exist.rows.length > 0) {
-            return res.render('Register', { error: "Looks like this email is already registered. Try Sign In" });
+            return res.render('register', { error: "Looks like this email is already registered. Try Sign In" });
         }
         else {
             bcrypt.hash(Password, saltRound, async (err, hash) => {
