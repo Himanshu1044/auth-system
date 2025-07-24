@@ -16,16 +16,16 @@ const saltRound = 10;
 env.config();
 
 db.connect()
-  .then(() => {
-    console.log('✅ Connected to the database');
+    .then(() => {
+        console.log('✅ Connected to the database');
 
-    app.listen(process.env.PORT || 4000, () => {
-      console.log(`🚀 Server running at http://localhost:${process.env.PORT || 4000}`);
+        app.listen(process.env.PORT || 4000, () => {
+            console.log(`🚀 Server running at http://localhost:${process.env.PORT || 4000}`);
+        });
+    })
+    .catch((err) => {
+        console.error('❌ Error while connecting to DB:', err);
     });
-  })
-  .catch((err) => {
-    console.error('❌ Error while connecting to DB:', err);
-  });
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -127,7 +127,13 @@ app.post('/register', async (req, res) => {
 
 // Login page routes
 app.get('/login', (req, res) => {
-    res.status(200).render('Login', { error: null })
+    try {
+        res.status(200).render('Login', { error: null })
+    }
+    catch (err) {
+        console.error("🔥 Error in GET /register:", err);
+        res.status(500).send("Internal Server Error");
+    }
 })
 app.post('/login', async (req, res) => {
     const email = req.body.email;
