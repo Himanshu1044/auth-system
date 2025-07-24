@@ -99,31 +99,35 @@ app.get('/register', (req, res) => {
     res.status(200).render('register', { error: null })
 })
 app.post('/register', async (req, res) => {
-    const fname = req.body.firstName
-    const lname = req.body.lastName
-    const Email = req.body.email
-    const Password = req.body.password
+    const fname = req.body.firstName;
+    const lname = req.body.lastName;
+    const Email = req.body.email;
+    const Password = req.body.password;
     const Name = fname + ' ' + lname;
+
     try {
-        const exist = await db.query('SELECT * FROM users WHERE email=$1', [Email])
+        const exist = await db.query('SELECT * FROM users WHERE email=$1', [Email]);
+
         if (exist.rows.length > 0) {
-            return res.render('register', { error: "Looks like this email is already registered. Try Sign In" });
+            return res.render('register', {
+                error: "Looks like this email is already registered. Try Sign In",
+            });
         }
-        else {
-            bcrypt.hash(Password, saltRound, async (err, hash) => {
-                if (err) { console.log(err) }
-                else {
-                    await db.query('INSERT INTO users (username,email,password) values($1,$2,$3)', [Name, Email.toLowerCase(), hash])
-                    res.redirect('/login')
-                }
-            })
-        }
+
+        const hash = await bcrypt.hash(Password, saltRound); // ✅ Use await here
+
+        await db.query(
+            'INSERT INTO users (username,email,password) values($1,$2,$3)',
+            [Name, Email.toLowerCase(), hash]
+        );
+
+        res.redirect('/login');
+    } catch (err) {
+        console.error("🔥 Error in POST /register:", err);
+        res.status(500).render('500');
     }
-    catch (err) {
-        console.log(err)
-        res.status(500).render('500')
-    }
-})
+});
+
 
 // Login page routes
 app.get('/login', (req, res) => {
@@ -221,7 +225,11 @@ app.post('/reset-pass', async (req, res) => {
             res.send('error')
         }
         else {
-            await db.query("UPDATE users SET password = $1, reset_token=NULL, reset_token_expires=NULL WHERE reset_token=$2", [hash, token])
+            const hash = await bcrypt.hash(newPassword, saltRound);
+            await db.query(
+                "UPDATE users SET password = $1, reset_token=NULL, reset_token_expires=NULL WHERE reset_token=$2",
+                [hash, token]
+            );
             res.redirect('Dashboard')
         }
     })
