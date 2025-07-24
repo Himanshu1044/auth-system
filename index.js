@@ -44,7 +44,7 @@ app.use(passport.session());
 passport.use('google', new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    callbackURL: "https://auth-system-3ufn.onrender.com/auth/google/callback",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
     async (accessToken, refreshToken, profile, cb) => {
@@ -223,8 +223,6 @@ app.post('/reset-pass', async (req, res) => {
 
 // Logout routes
 app.post('/logout', (req, res) => {
-    // req.logout(err => { if (err) console.log(err) })
-
     req.session.destroy(() => {
         res.redirect('/')
     })
