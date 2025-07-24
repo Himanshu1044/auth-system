@@ -16,8 +16,16 @@ const saltRound = 10;
 env.config();
 
 db.connect()
-    .then(() => { console.log('Database is connected') })
-    .catch((err) => { console.log('Error while connecting to db') })
+  .then(() => {
+    console.log('✅ Connected to the database');
+
+    app.listen(process.env.PORT || 4000, () => {
+      console.log(`🚀 Server running at http://localhost:${process.env.PORT || 4000}`);
+    });
+  })
+  .catch((err) => {
+    console.error('❌ Error while connecting to DB:', err);
+  });
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -226,6 +234,4 @@ app.post('/logout', (req, res) => {
 app.use((req, res) => {
     res.status(404).render('404')
 })
-app.listen(Port, () => {
-    console.log(`Server is running at http://localhost:${Port}`)
-})
+
