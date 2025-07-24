@@ -1,0 +1,10 @@
+<%- include('partials/navbar') %>
+<% if (user) { %>
+    <h1 style="text-align: center;">Welcome, <%= user.username || user.name %></h1>
+            <form action="/logout" method="post" style="text-align: center;">
+                <button class="btn btn-primary btn-lg" type="submit">Log Out</button>
+            </form>
+    </h2>
+    <% } else {%>
+        <h2>Login First</h2>
+        <%} %>
